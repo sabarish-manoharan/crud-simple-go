@@ -70,6 +70,7 @@ personForm.addEventListener("submit", function (e) {
 
 async function getData() {
   try {
+    showLoader();
     const res = await fetch(`${host}/persons`, {
       method: "GET",
     });
@@ -78,7 +79,7 @@ async function getData() {
     if (!res.ok) throw new Error("server error");
     const data = await res.json();
     datas = data;
-
+hideLoader();
     refreshTable();
   } catch (err) {
     console.error("Error : ", err);
@@ -155,4 +156,11 @@ function refreshTable() {
           <td><button class="btn btn-danger"  onclick="deleteData(this)" data-id=${element.id}>Delete</button></td>`;
     table.appendChild(tr);
   });
+}
+
+function showLoader() {
+  document.getElementById("loader").style.display = "block";
+}
+function hideLoader() {
+  document.getElementById("loader").style.display = "none";
 }
