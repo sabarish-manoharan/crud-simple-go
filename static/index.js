@@ -1,3 +1,6 @@
+
+const host = "https://go-crud-5hk7.onrender.com";
+
 let datas = {};
 const personForm = document.getElementById("personForm");
 const personAge = document.getElementById("personAge");
@@ -25,7 +28,7 @@ async function AddData() {
   const age = parseInt(personAge.value);
   const id = "" + Date.now();
   try {
-    const res = await fetch("http://localhost:8000/person", {
+    const res = await fetch(`${host}/person`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +70,7 @@ personForm.addEventListener("submit", function (e) {
 
 async function getData() {
   try {
-    const res = await fetch("http://localhost:8000/persons", {
+    const res = await fetch(`${host}/persons`, {
       method: "GET",
     });
     // .then((res) => res.json())
@@ -94,7 +97,7 @@ function updateData(btn) {
 async function update() {
   try {
     let age = parseInt(modifyPersonAge.value);
-    const res = await fetch(`http://localhost:8000/person/${updateId}`, {
+    const res = await fetch(`${host}/person/${updateId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -122,7 +125,7 @@ async function deleteData(btn) {
   try {
     if (!confirm("Are you want to delete the data ? ")) return;
     const id = btn.getAttribute("data-id");
-    await fetch(`http://localhost:8000/person/${id}`, {
+    await fetch(`${host}/person/${id}`, {
       method: "DELETE",
     });
     getData();
