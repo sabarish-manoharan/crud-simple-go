@@ -11,10 +11,9 @@ const modifyPersonOccupation = document.getElementById(
 );
 
 let updateId = 0;
-window.onload = function(){
+window.onload = function () {
   getData();
-}
-
+};
 
 function updateAddForm() {
   personAge.value = "";
@@ -22,44 +21,66 @@ function updateAddForm() {
   personOccupation.value = "";
 }
 
-
 async function AddData() {
-  age = parseInt(personAge.value);
-  cryptoId = crypto.randomUUID();
-  const id = cryptoId;
-  await fetch("http://localhost:8000/person", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: personName.value,
-      age: age,
-      occupation: personOccupation.value,
-      id: id,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => (datas = data));
-     console.log(datas);
-     getData();
+  const age = parseInt(personAge.value);
+  const id = "" + Date.now();
+  try {
+    const res = await fetch("http://localhost:8000/person", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: personName.value,
+        age: age,
+        occupation: personOccupation.value,
+        id: id,
+      }),
+    });
+    //   .then((res) => res.json())
+    //   .then((data) => (datas = data));
+    if (!res.ok) throw new Error("Server Error");
+    datas = await res.json();
+    console.log(datas);
+    updateAddForm();
+    getData();
+    const modalElement = document.getElementById("addPersonModal"); 
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    modalInstance.hide();
+  } catch (err) {
+    console.error("Error : ", err);
+    alert("Something went wrong!");
+  }
 }
 personForm.addEventListener("submit", function (e) {
   e.preventDefault();
-  // if(!personName.value || !personAge.value || !personOccupation.value){
-  //     alert("Please fill all fields");
-  //     return;
-  // }
-  AddData();
+  if (
+    !personName.value.trim() ||
+    !personAge.value.trim() ||
+    !personOccupation.value.trim()
+  ) {
+    alert("Please fill all fields");
+    return;
+  }
+  AddData().then(updateAddForm);
 });
-async function getData() {
-  await fetch("http://localhost:8000/persons", {
-    method: "GET",
-  })
-    .then((res) => res.json())
-    .then((data) => (datas = data));
 
-  refreshTable();
+async function getData() {
+  try {
+    const res = await fetch("http://localhost:8000/persons", {
+      method: "GET",
+    });
+    // .then((res) => res.json())
+    // .then((data) => (datas = data));
+    if (!res.ok) throw new Error("server error");
+    const data = await res.json();
+    datas = data;
+
+    refreshTable();
+  } catch (err) {
+    console.error("Error : ", err);
+    alert("Something went wrong");
+  }
 }
 
 function updateData(btn) {
@@ -71,40 +92,54 @@ function updateData(btn) {
 }
 
 async function update() {
-  let age = parseInt(modifyPersonAge.value);
-  await fetch(`http://localhost:8000/person/${updateId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: modifyPersonName.value,
-      age: age,
-      occupation: modifyPersonOccupation.value,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => (datas = data));
-  refreshTable();
+  try {
+    let age = parseInt(modifyPersonAge.value);
+    const res = await fetch(`http://localhost:8000/person/${updateId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: modifyPersonName.value,
+        age: age,
+        occupation: modifyPersonOccupation.value,
+      }),
+    });
+    //   .then((res) => res.json())
+    //   .then((data) => (datas = data));
+    if (!res.ok) throw new Error("server error");
+
+    datas = await res.json();
+
+    refreshTable();
+  } catch (err) {
+    console.error("Error : ", err);
+    alert("Something went wrong");
+  }
 }
 
 async function deleteData(btn) {
-  const id = btn.getAttribute("data-id");
-  await fetch(`http://localhost:8000/person/${id}`,{
-    method:'DELETE'
-  })
-  getData();
+  try {
+    if (!confirm("Are you want to delete the data ? ")) return;
+    const id = btn.getAttribute("data-id");
+    await fetch(`http://localhost:8000/person/${id}`, {
+      method: "DELETE",
+    });
+    getData();
+  } catch (err) {
+    console.error("Something went wrong");
+  }
 }
 
 function refreshTable() {
   table.innerHTML = "";
-  
-if (!Array.isArray(datas) || datas.length === 0) {
-  table.innerHTML = ` <tr>
+
+  if (!Array.isArray(datas) || datas.length === 0) {
+    table.innerHTML = ` <tr>
       <td colspan="5" class="text-center py-3 fs-4">No Data Found</td>
     </tr>`;
     return;
-}
+  }
 
   datas.forEach((element, index) => {
     const tr = document.createElement("tr");

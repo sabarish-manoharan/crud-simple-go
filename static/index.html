@@ -30,7 +30,6 @@
             class="btn btn-success"
             data-bs-toggle="modal"
             data-bs-target="#addPersonModal"
-            onclick="updateAddForm()"
           >
             ADD
           </button>
@@ -38,7 +37,7 @@
       </div>
       <div class="d-flex align-items-center justify-content-center my-2 my-md-5">
         <table
-          class="table border table-striped table-bordered w-75 text-center"
+          class="table border table-striped table-hover table-bordered w-75 text-center"
         >
           <thead>
             <tr>
@@ -109,17 +108,16 @@
                     required
                   />
                 </div>
-              </form>
               <div>
                 <button
                   type="submit"
-                  data-bs-dismiss="modal"
                   class="btn btn-success"
-                  onclick="AddData()"
                 >
                   Add
                 </button>
               </div>
+              
+              </form>
             </div>
           </div>
         </div>
