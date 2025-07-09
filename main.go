@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 type person struct {
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-	Id   int    `json:"id"`
+	Name       string `json:"name"`
+	Age        int    `json:"age"`
+	Occupation string `json:"occupation"`
+	Id         string `json:"id"`
 }
 
 var persons []person
@@ -26,20 +27,14 @@ func personCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	json.NewEncoder(w).Encode(p)
+	w.Header().Set("Content-Type", "application/json")
 	persons = append(persons, p)
+	json.NewEncoder(w).Encode(persons)
 
 }
 func getPerson(w http.ResponseWriter, r *http.Request) {
-	if len(persons) == 0 {
-		fmt.Fprintln(w, "Data Not Found")
-		return
-	}
-
 	w.Header().Set("Content-Type", "application-json")
 	json.NewEncoder(w).Encode(persons)
-
 }
 func updatePerson(w http.ResponseWriter, r *http.Request) {
 	var p person
@@ -52,11 +47,7 @@ func updatePerson(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	found := false
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		fmt.Fprintln(w, "conversion error")
-		return
-	}
+	id := vars["id"]
 	for i, person := range persons {
 		if person.Id == id {
 			persons[i] = p
@@ -73,27 +64,24 @@ func updatePerson(w http.ResponseWriter, r *http.Request) {
 }
 func deletePerson(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	idToRemove, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		fmt.Fprintln(w, "String conversion error")
-		return
-	}
-	found := false
+	idToRemove := vars["id"]
 	for i, p := range persons {
 		if p.Id == idToRemove {
 			persons = append(persons[:i], persons[i+1:]...)
-			found = true
 		}
-	}
-	if found {
-		fmt.Fprintln(w, "Deleted!")
-	} else {
-		http.Error(w, "Element Not Found", http.StatusNotFound)
 	}
 }
 func main() {
 
 	r := mux.NewRouter()
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://127.0.0.1:5500"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(r)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello world")
@@ -102,8 +90,7 @@ func main() {
 	r.HandleFunc("/persons", getPerson).Methods("GET")
 	r.HandleFunc("/person/{id}", deletePerson).Methods("DELETE")
 	r.HandleFunc("/person/{id}", updatePerson).Methods("PUT")
-	http.Handle("/", r)
-	fmt.Println("Server is connected in the port 8000")
+	http.Handle("/", handler)
+	fmt.Println("Server is connected in the port :  8000")
 	http.ListenAndServe(":8000", nil)
-
 }
