@@ -59,7 +59,6 @@ async function getData() {
     .then((res) => res.json())
     .then((data) => (datas = data));
 
-  console.log(datas);
   refreshTable();
 }
 
