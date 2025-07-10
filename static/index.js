@@ -1,6 +1,5 @@
-
- const host = "https://go-crud-5hk7.onrender.com";
-// const host = "http://localhost:8000"
+// const host = "https://go-crud-5hk7.onrender.com";
+const host = "http://localhost:8000";
 let datas = {};
 const personForm = document.getElementById("personForm");
 const personAge = document.getElementById("personAge");
@@ -14,6 +13,7 @@ const modifyPersonOccupation = document.getElementById(
 );
 
 let updateId = 0;
+let updateIndex = 0;
 window.onload = function () {
   getData();
 };
@@ -45,7 +45,7 @@ async function AddData() {
     console.log(datas);
     updateAddForm();
     getData();
-    const modalElement = document.getElementById("addPersonModal"); 
+    const modalElement = document.getElementById("addPersonModal");
     const modalInstance = bootstrap.Modal.getInstance(modalElement);
     modalInstance.hide();
   } catch (err) {
@@ -77,8 +77,8 @@ async function getData() {
     if (!res.ok) throw new Error("server error");
     const data = await res.json();
     datas = data;
-hideLoader();
-console.log(datas);
+    hideLoader();
+    console.log(datas);
     refreshTable();
   } catch (err) {
     console.error("Error : ", err);
@@ -89,9 +89,10 @@ console.log(datas);
 function updateData(btn) {
   updateId = btn.getAttribute("data-id");
   const index = btn.getAttribute("data-index");
-  modifyPersonName.value = datas[index].name;
-  modifyPersonAge.value = datas[index].age;
-  modifyPersonOccupation.value = datas[index].occupation;
+  updateIndex = index;
+  modifyPersonName.value = datas[index].Name;
+  modifyPersonAge.value = datas[index].Age;
+  modifyPersonOccupation.value = datas[index].Occupation;
 }
 
 async function update() {
@@ -111,10 +112,12 @@ async function update() {
     //   .then((res) => res.json())
     //   .then((data) => (datas = data));
     if (!res.ok) throw new Error("server error");
-
-    datas = await res.json();
-
-    refreshTable();
+    const updatedPerson =await res.json();
+    // Update local datas array
+    const index = updateIndex;
+    datas[index] = updatedPerson;
+    refreshTable(); // re-render UI
+  
   } catch (err) {
     console.error("Error : ", err);
     alert("Something went wrong");

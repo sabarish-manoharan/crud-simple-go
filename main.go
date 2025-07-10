@@ -41,7 +41,7 @@ func updatePerson(w http.ResponseWriter, r *http.Request) {
 	var person db.Person
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if err := db.DB.Find(&person, id).Error; err != nil {
+	if err := db.DB.First(&person, id).Error; err != nil {
 		http.Error(w, "Person not found", http.StatusNotFound)
 	}
 
@@ -58,7 +58,7 @@ func updatePerson(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode("Updated Successfully")
+	json.NewEncoder(w).Encode(person)
 
 }
 func deletePerson(w http.ResponseWriter, r *http.Request) {
@@ -77,8 +77,8 @@ func main() {
 
 	r := mux.NewRouter()
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"https://go-crud.netlify.app"},
-		//AllowedOrigins:   []string{"*"},
+		// ==AllowedOrigins: []string{"https://go-crud.netlify.app"},
+		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,
