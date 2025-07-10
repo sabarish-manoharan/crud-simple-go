@@ -77,8 +77,8 @@ func main() {
 
 	r := mux.NewRouter()
 	c := cors.New(cors.Options{
-		// ==AllowedOrigins: []string{"https://go-crud.netlify.app"},
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins: []string{"https://go-crud.netlify.app"},
+		//AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,

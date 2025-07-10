@@ -1,5 +1,5 @@
-// const host = "https://go-crud-5hk7.onrender.com";
-const host = "http://localhost:8000";
+const host = "https://go-crud-5hk7.onrender.com";
+//const host = "http://localhost:8000";
 let datas = {};
 const personForm = document.getElementById("personForm");
 const personAge = document.getElementById("personAge");
