@@ -1,6 +1,6 @@
 
-const host = "https://go-crud-5hk7.onrender.com";
-
+ const host = "https://go-crud-5hk7.onrender.com";
+// const host = "http://localhost:8000"
 let datas = {};
 const personForm = document.getElementById("personForm");
 const personAge = document.getElementById("personAge");
@@ -26,7 +26,6 @@ function updateAddForm() {
 
 async function AddData() {
   const age = parseInt(personAge.value);
-  const id = "" + Date.now();
   try {
     const res = await fetch(`${host}/person`, {
       method: "POST",
@@ -37,7 +36,6 @@ async function AddData() {
         name: personName.value,
         age: age,
         occupation: personOccupation.value,
-        id: id,
       }),
     });
     //   .then((res) => res.json())
@@ -80,6 +78,7 @@ async function getData() {
     const data = await res.json();
     datas = data;
 hideLoader();
+console.log(datas);
     refreshTable();
   } catch (err) {
     console.error("Error : ", err);
@@ -126,6 +125,7 @@ async function deleteData(btn) {
   try {
     if (!confirm("Are you want to delete the data ? ")) return;
     const id = btn.getAttribute("data-id");
+    console.log(id);
     await fetch(`${host}/person/${id}`, {
       method: "DELETE",
     });
@@ -148,12 +148,12 @@ function refreshTable() {
   datas.forEach((element, index) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-     <td>${element.name}</td>
-          <td>${element.age}</td>
-          <td>${element.occupation}</td>
+     <td>${element.Name}</td>
+          <td>${element.Age}</td>
+          <td>${element.Occupation}</td>
           <td><button class="btn btn-warning"  data-bs-toggle="modal"
-            data-bs-target="#modifyPersonModal" data-id=${element.id} onclick="updateData(this)" data-index=${index} >Modify</button></td>
-          <td><button class="btn btn-danger"  onclick="deleteData(this)" data-id=${element.id}>Delete</button></td>`;
+            data-bs-target="#modifyPersonModal" data-id="${element.ID}" onclick="updateData(this)" data-index=${index} >Modify</button></td>
+          <td><button class="btn btn-danger"  onclick="deleteData(this)" data-id="${element.ID}">Delete</button></td>`;
     table.appendChild(tr);
   });
 }
